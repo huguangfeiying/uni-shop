@@ -12,32 +12,42 @@ uni.$http = $http
 $http.baseUrl = 'https://www.uinav.com'
 
 // 请求拦截器
-$http.beforeRequest = function (options) {
-    uni.showLoading({
-        title: '数据加载中...'
-    })
+$http.beforeRequest = function(options) {
+  uni.showLoading({
+    title: '数据加载中...'
+  })
+  // console.log(store)
+  // 判断请求的是否为有权限的 API 接口
+  if (options.url.indexOf('/my/') !== -1) {
+    // 为请求头添加身份认证字段
+    options.header = {
+      // 字段的值可以直接从 vuex 中进行获取
+      Authorization: store.state.user.token,
+    }
+  }
 }
 
 // 响应拦截器
-$http.afterRequest = function () {
-    uni.hideLoading()
+$http.afterRequest = function() {
+  uni.hideLoading()
 }
 
 // 封装弹窗的方法
-uni.$showMsg = function (title='数据请求失败', duration=1500, icon='none') {
-    uni.showToast({
-        title,
-        duration,
-        icon
-    })
+uni.$showMsg = function(title = '数据请求失败', duration = 1500, icon = 'none') {
+  uni.showToast({
+    title,
+    duration,
+    icon
+  })
 }
+
 
 Vue.config.productionTip = false
 
 App.mpType = 'app'
 
 const app = new Vue({
-    ...App,
-    store
+  ...App,
+  store
 })
 app.$mount()
